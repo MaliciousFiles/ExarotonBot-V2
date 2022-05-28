@@ -24,7 +24,6 @@
     </content>
     <orderEntry type="jdk" jdkName="17" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Libraries" level="project" />
     <orderEntry type="library" name="Maven: com.github.kklisura.cdt:cdt-java-client:4.0.0" level="project" />
     <orderEntry type="library" name="Maven: javax.websocket:javax.websocket-api:1.1" level="project" />
     <orderEntry type="library" name="Maven: org.glassfish.tyrus:tyrus-container-grizzly-client:1.13.1" level="project" />
@@ -58,5 +57,6 @@
     <orderEntry type="library" name="Maven: com.dorkbox:TweenEngine:8.3" level="project" />
     <orderEntry type="library" name="Maven: com.dorkbox:ObjectPool:2.11" level="project" />
     <orderEntry type="library" name="Maven: com.profesorfalken:jPowerShell:3.0.4" level="project" />
+    <orderEntry type="library" name="Libraries" level="project" />
   </component>
 </module>
