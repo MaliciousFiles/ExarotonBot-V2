@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Minecraft Libraries">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/../Vanilla Minecraft/Libraries" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <jarDirectory url="file://$PROJECT_DIR$/../Vanilla Minecraft/Libraries" recursive="false" />
+  </library>
+</component>

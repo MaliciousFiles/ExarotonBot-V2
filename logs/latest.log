@@ -1,0 +1,22 @@
+[19:27:23] [main/INFO]: Environment: authHost='https://authserver.mojang.com', accountsHost='https://api.mojang.com', sessionHost='https://sessionserver.mojang.com', servicesHost='https://api.minecraftservices.com', name='PROD'
+[19:27:23] [main/INFO]: Launching chrome process /Applications/Google Chrome.app/Contents/MacOS/Google Chrome with arguments {app=https://login.live.com/oauth20_authorize.srf?client_id=00000000402b5328&response_type=code&redirect_uri=https%3A%2F%2Flogin.live.com%2Foauth20_desktop.srf&scope=XboxLive.signin%20offline_access&prompt=select_account, disable-component-extensions-with-background-pages=true, no-first-run=true, disable-restore-session-state=true, remote-debugging-port=0, force-app-mode=true, disable-extensions=true, user-data-dir=/var/folders/3c/0ffb9wx50934d_y1l0fljnkh0000gp/T/ExarotonBot, no-default-browser-check=true, disable-first-run-ui=true, window-size=500,650}
+[19:27:30] [main/INFO]: Closing chrome process...
+[19:27:31] [main/INFO]: Chrome process closed.
+[19:27:37] [main/INFO]: [STDOUT]: GOT IT! eyJhbGciOiJIUzI1NiJ9.eyJ4dWlkIjoiMjUzNTQ2ODk1NzMxMDQ2MCIsImFnZyI6IlRlZW4iLCJzdWIiOiJhNWEzNGFlMy1iOWI4LTRiOTMtODBhYy00ZTE5YjBlMzJjZWIiLCJuYmYiOjE2NTM2OTc2NTksImF1dGgiOiJYQk9YIiwicm9sZXMiOltdLCJpc3MiOiJhdXRoZW50aWNhdGlvbiIsImV4cCI6MTY1Mzc4NDA1OSwiaWF0IjoxNjUzNjk3NjU5LCJwbGF0Zm9ybSI6IlVOS05PV04iLCJ5dWlkIjoiNzI1NmY1MmE0ZTM1NDY3MjhiNGI5MGQyNTU1MjJjMzAifQ.EcM3jHB9H79ZFEEJk5OYA9z7zqid8JCRj83kT4PqfKs
+[19:27:38] [main/INFO]: [STDOUT]: checking player count: 0
+[19:27:38] [main/INFO]: [STDOUT]: Connecting
+[19:27:39] [main/INFO]: [STDERR]: java.lang.RuntimeException: java.net.UnknownHostException: BoardGameClub.exaroton.me: nodename nor servname provided, or not known
+[19:27:39] [main/INFO]: [STDERR]: 	at io.github.maliciousfiles.ExarotonBot.connect(ExarotonBot.java:364)
+[19:27:39] [main/INFO]: [STDERR]: 	at io.github.maliciousfiles.ExarotonBot.checkPlayerCount(ExarotonBot.java:383)
+[19:27:39] [main/INFO]: [STDERR]: 	at io.github.maliciousfiles.ExarotonBot.main(ExarotonBot.java:125)
+[19:27:39] [main/INFO]: [STDERR]: Caused by: java.net.UnknownHostException: BoardGameClub.exaroton.me: nodename nor servname provided, or not known
+[19:27:39] [main/INFO]: [STDERR]: 	at java.base/java.net.Inet6AddressImpl.lookupAllHostAddr(Native Method)
+[19:27:39] [main/INFO]: [STDERR]: 	at java.base/java.net.InetAddress$PlatformNameService.lookupAllHostAddr(InetAddress.java:933)
+[19:27:39] [main/INFO]: [STDERR]: 	at java.base/java.net.InetAddress.getAddressesFromNameService(InetAddress.java:1519)
+[19:27:39] [main/INFO]: [STDERR]: 	at java.base/java.net.InetAddress$NameServiceAddresses.get(InetAddress.java:852)
+[19:27:39] [main/INFO]: [STDERR]: 	at java.base/java.net.InetAddress.getAllByName0(InetAddress.java:1509)
+[19:27:39] [main/INFO]: [STDERR]: 	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1367)
+[19:27:39] [main/INFO]: [STDERR]: 	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1301)
+[19:27:39] [main/INFO]: [STDERR]: 	at java.base/java.net.InetAddress.getByName(InetAddress.java:1251)
+[19:27:39] [main/INFO]: [STDERR]: 	at io.github.maliciousfiles.ExarotonBot.connect(ExarotonBot.java:352)
+[19:27:39] [main/INFO]: [STDERR]: 	... 2 more
