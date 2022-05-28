@@ -15,6 +15,7 @@ import com.google.gson.JsonObject;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
 import fr.jcgay.notification.*;
+import fr.jcgay.notification.notifier.systemtray.SystemTrayNotifier;
 import net.minecraft.CrashReport;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.User;
@@ -34,12 +35,17 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 
-import java.io.File;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.*;
 
 public class ExarotonBot {
@@ -57,7 +63,6 @@ public class ExarotonBot {
     // EXAROTON STUFF
     private static final String API_TOKEN = "l9rQYkymgqAB0jv4I1R4txMFWvtoQTQLEEupxFWe71A36TdNohz0TXArIID5fr1zlB6prKR5Eoc8nGivEestpHcMqVXMZ3dWl4SO";
     private static final String SERVER_ID = "Fcczg85in9GoALSn";
-//    private static final int PLAYER_CHECK_INTERVAL = 1000 * 60 * 5 + 30;
 
     // AUTH STUFF
     public static final String NAME = "MaliciousFiles";
@@ -83,8 +88,56 @@ public class ExarotonBot {
                     .id("ExarotonBot")
                     .icon(ICON)
                     .build())
-            .setChosenNotifier("notificationcenter")
             .initNotifier();
+    private static final String ACTION_COMMAND = "Exit";
+
+    static {
+        if (NOTIFIER instanceof SystemTrayNotifier) {
+            try {
+                Field icon = SystemTrayNotifier.class.getDeclaredField("icon");
+                icon.setAccessible(true);
+
+                TrayIcon trayIcon = (TrayIcon) icon.get(NOTIFIER);
+
+                final Frame frame = new Frame("");
+                frame.setUndecorated(true);
+                frame.setType(Window.Type.UTILITY);
+
+                frame.setResizable(false);
+                frame.setVisible(true);
+
+                PopupMenu menu = new PopupMenu("label");
+                menu.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        if (e.getActionCommand().equals(ACTION_COMMAND)) {
+                            if (connected) disconnect("Application quit.", false);
+                            System.exit(0);
+                        }
+                    }
+                });
+                menu.setFont(new Font("Jokerman", Font.PLAIN, 15));
+
+                MenuItem mi = new MenuItem(ACTION_COMMAND);
+                mi.setActionCommand(ACTION_COMMAND);
+                menu.add(mi);
+
+                trayIcon.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        if (e.getButton() == MouseEvent.BUTTON1) {
+                            frame.add(menu);
+                            menu.show(frame, e.getXOnScreen(), e.getYOnScreen());
+                        }
+                    }
+                });
+
+                trayIcon.setPopupMenu(menu);
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     private static MinecraftSessionService sessionService;
     private static Connection connection;
@@ -105,7 +158,7 @@ public class ExarotonBot {
 
         setAccessToken();
 
-//        connect("localhost", 25565);
+        notify("Success", "Access token acquired.");
 
         try {
             ExarotonClient client = new ExarotonClient(API_TOKEN);
@@ -125,31 +178,18 @@ public class ExarotonBot {
                 checkPlayerCount();
             }
 
-            /*while (true) {
-                try {
-                    if (server.get().hasStatus(ServerStatus.ONLINE)) {
-                        checkPlayerCount();
-                    }
-                } catch (APIException e) {
-                    e.printStackTrace();
-                }
-                Thread.sleep(PLAYER_CHECK_INTERVAL);
-            }*/
             while (true);
         } catch (APIException e) {
             e.printStackTrace();
         }
 
-//        connect("127.0.0.1", 25565);
-//        while (connection.isConnected() || connection.isConnecting());
-
         System.out.println("Exiting - error!!");
-        notify("Exiting", "An error occurred. Check console!");
+        notify("Exiting", "An error occurred.");
     }
 
     public static void notify(String title, String message) {
         NOTIFIER.send(Notification.builder()
-                .title("")
+                .title(title)
                 .subtitle(title)
                 .message(message)
                 .icon(ICON)
@@ -165,59 +205,6 @@ public class ExarotonBot {
 
         int width = 500;
         int height = 650;
-
-        String os = System.getProperty("os.name");
-        Runtime runtime = Runtime.getRuntime();
-
-        String start = null;
-        switch (os) {
-            case "Windows_NT": {
-                String[] pathsW = new String[]{"HKEY_LOCAL_MACHINE", "HKEY_CURRENT_USER"};
-                String[] compatibleW = new String[]{"chrome.exe", "vivaldi.exe", "brave.exe", "blisk.exe", "msedge.exe"};
-                WE:
-                {
-                    for (String file : compatibleW) {
-                        for (String path : pathsW) {
-                            try {
-                                String locW = path + "\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\";
-                                String out = new String(runtime.exec("\"C:\\Windows\\System32\\reg.exe\" query \"" + locW + file + "\"").getInputStream().readAllBytes());
-                                if (!out.startsWith("ERROR")) {
-                                    out = out.substring(out.indexOf("REG_SZ") + "REG_SZ".length()).trim();
-                                    if (out.indexOf("\n") > 0) {
-                                        out = out.substring(0, out.indexOf("\n") - 1);
-                                    }
-                                    if (new File(out).exists()) {
-                                        start = out;
-                                        break WE;
-                                    }
-                                }
-                            } catch (IOException ignored) {}
-                        }
-                    }
-                }
-
-                break;
-            }
-            case "Mac OS X": {
-                String locD = "/Applications/FILE.app/Contents/MacOS/FILE";
-                String[] compatibleD = new String[]{"Google\\ Chrome", "Google Chrome", "Microsoft\\ Edge", "Microsoft Edge", "Vivaldi", "Blisk", "Brave\\ Browser", "Brave Browser", "Yandex"};
-                for (String file : compatibleD) {
-                    String s = locD.replaceAll("FILE", file);
-                    if (new File(s).exists()) {
-                        start = s;
-                        break;
-                    }
-                }
-                if (start != null) {
-                    break;
-                }
-            }
-            case "Linux":
-                throw new RuntimeException("Linux is not supported!");
-            default: {
-                throw new RuntimeException("Cannot find valid browser!");
-            }
-        }
 
         String redirect = "https://login.live.com/oauth20_authorize.srf" + "?client_id=" + client_id + "&response_type=code" + "&redirect_uri=" + URLEncoder.encode(token_redirect, StandardCharsets.UTF_8) + "&scope=XboxLive.signin%20offline_access&prompt=" + prompt;
 
@@ -240,8 +227,14 @@ public class ExarotonBot {
                 )).build());
 
         try {
-            String loc;
-            while (!(loc = service.getTabs().get(0).getUrl()).startsWith(token_redirect));
+            String loc = null;
+
+            try {
+                while (!(loc = service.getTabs().get(0).getUrl()).startsWith(token_redirect));
+            } catch (ArrayIndexOutOfBoundsException e) {
+                notify("Exiting", "Microsoft authentication failed.");
+                System.exit(0);
+            }
 
             launcher.close();
 
@@ -373,7 +366,7 @@ public class ExarotonBot {
         if (players == 1 && connected) {
             System.out.println("Only player online.");
             disconnect("Only player online.");
-        } else if (/*players > 0 && */!connected) {
+        } else if (players > 0 && !connected) {
             System.out.println("Connecting");
 
             StringBuilder message = new StringBuilder(players + " players online: ");
@@ -384,21 +377,13 @@ public class ExarotonBot {
         }
     }
 
-    /*public static void addPlayer() {
-        System.out.println("Player joined.");
-        players++;
-        checkPlayerCount();
+    public static void disconnect(String reason) {
+        disconnect(reason, true);
     }
 
-    public static void removePlayer() {
-        System.out.println("Player left.");
-        players--;
-        checkPlayerCount();;
-    }*/
-
-    public static void disconnect(String reason) {
+    public static void disconnect(String reason, boolean notify) {
         System.out.println("Disconnecting!! "+reason);
-        notify("Disconnecting", reason);
+        if (notify) notify("Disconnecting", reason);
         connection.disconnect(new TranslatableComponent(reason));
         connected = false;
     }

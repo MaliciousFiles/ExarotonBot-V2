@@ -11,6 +11,7 @@ import net.minecraft.world.entity.player.ChatVisiblity;
 
 import java.util.UUID;
 
+@SuppressWarnings("NullableProblems")
 public class CustomClientPacketHandler implements ClientGamePacketListener {
 
     private final Connection connection;
@@ -69,6 +70,8 @@ public class CustomClientPacketHandler implements ClientGamePacketListener {
         String message = clientboundChatPacket.getMessage().getString();
         String sender = ExarotonBot.PLAYER_NAMES.get(clientboundChatPacket.getSender());
         if (sender == null) sender = "Server";
+
+//        System.out.println(sender+": "+message);
 
         if (message.toLowerCase().contains(ExarotonBot.NAME.toLowerCase()) || message.contains(sender+" whispers to you: ")) {
             ExarotonBot.notify("Chat Message", message);
@@ -143,10 +146,7 @@ public class CustomClientPacketHandler implements ClientGamePacketListener {
     public void handleMoveEntity(ClientboundMoveEntityPacket clientboundMoveEntityPacket) {}
 
     @Override
-    public void handleMovePlayer(ClientboundPlayerPositionPacket clientboundPlayerPositionPacket) {
-//        connection.send(new ServerboundAcceptTeleportationPacket(clientboundPlayerPositionPacket.getId()));
-//        connection.send(new ServerboundMovePlayerPacket.PosRot(clientboundPlayerPositionPacket.getX(), clientboundPlayerPositionPacket.getY(), clientboundPlayerPositionPacket.getZ(), clientboundPlayerPositionPacket.getYRot(), clientboundPlayerPositionPacket.getXRot(), false));
-    }
+    public void handleMovePlayer(ClientboundPlayerPositionPacket clientboundPlayerPositionPacket) {}
 
     @Override
     public void handleParticleEvent(ClientboundLevelParticlesPacket clientboundLevelParticlesPacket) {}
@@ -165,7 +165,7 @@ public class CustomClientPacketHandler implements ClientGamePacketListener {
             clientboundPlayerInfoPacket.getEntries().forEach(e -> {
                 ExarotonBot.PLAYER_NAMES.put(e.getProfile().getId(), e.getProfile().getName());
                 if (!UUID.fromString(ExarotonBot.UUID).equals(e.getProfile().getId())) {
-//                    connection.send(new ServerboundChatPacket("/msg " + e.getProfile().getName() + " " + ExarotonBot.MESSAGE));
+                    connection.send(new ServerboundChatPacket("/msg " + e.getProfile().getName() + " " + ExarotonBot.MESSAGE));
                     ExarotonBot.notify("Player Joined", e.getProfile().getName()+" joined the game.");
                 }
             });
