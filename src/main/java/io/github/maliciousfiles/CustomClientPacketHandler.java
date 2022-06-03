@@ -5,6 +5,7 @@ import net.minecraft.client.ClientBrandRetriever;
 import net.minecraft.network.Connection;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.ChatVisiblity;
@@ -68,12 +69,8 @@ public class CustomClientPacketHandler implements ClientGamePacketListener {
     @Override
     public void handleChat(ClientboundChatPacket clientboundChatPacket) {
         String message = clientboundChatPacket.getMessage().getString();
-        String sender = ExarotonBot.PLAYER_NAMES.get(clientboundChatPacket.getSender());
-        if (sender == null) sender = "Server";
 
-//        System.out.println(sender+": "+message);
-
-        if (message.toLowerCase().contains(ExarotonBot.NAME.toLowerCase()) || message.contains(sender+" whispers to you: ")) {
+        if (message.toLowerCase().contains(ExarotonBot.NAME.toLowerCase()) || (clientboundChatPacket.getMessage().getStyle().isItalic() && message.contains(" whispers to you: "))) {
             ExarotonBot.notify("Chat Message", message);
         }
     }
@@ -140,6 +137,7 @@ public class CustomClientPacketHandler implements ClientGamePacketListener {
     public void handleLogin(ClientboundLoginPacket clientboundLoginPacket) {
         connection.send(new ServerboundClientInformationPacket("en_us", 12, ChatVisiblity.FULL, true, 255, HumanoidArm.RIGHT, false, true));
         connection.send(new ServerboundCustomPayloadPacket(ServerboundCustomPayloadPacket.BRAND, (new FriendlyByteBuf(Unpooled.buffer())).writeUtf(ClientBrandRetriever.getClientModName())));
+        System.out.println("logged in");
     }
 
     @Override
@@ -166,11 +164,12 @@ public class CustomClientPacketHandler implements ClientGamePacketListener {
                 ExarotonBot.PLAYER_NAMES.put(e.getProfile().getId(), e.getProfile().getName());
                 if (!UUID.fromString(ExarotonBot.UUID).equals(e.getProfile().getId())) {
                     connection.send(new ServerboundChatPacket("/msg " + e.getProfile().getName() + " " + ExarotonBot.MESSAGE));
+                    System.out.println("player joined");
                     ExarotonBot.notify("Player Joined", e.getProfile().getName()+" joined the game.");
                 }
             });
         } else if (clientboundPlayerInfoPacket.getAction().equals(ClientboundPlayerInfoPacket.Action.REMOVE_PLAYER)) {
-            clientboundPlayerInfoPacket.getEntries().forEach(e -> ExarotonBot.notify("Player Left", e.getProfile().getName()+" left the game."));
+            clientboundPlayerInfoPacket.getEntries().forEach(e -> ExarotonBot.notify("Player Left", ExarotonBot.PLAYER_NAMES.get(e.getProfile().getId())+" left the game."));
         }
     }
 

@@ -49,7 +49,7 @@ import java.util.List;
 import java.util.*;
 
 public class ExarotonBot {
-    public static final String MESSAGE = "This is a bot. If you would like to reach me for any purpose, please DM me in Discord (MaliciousFiles) or text me. Thank you! [P.S. this bot will automatically log off so as to preserve credits.]";
+    public static final String MESSAGE = "This is a bot. If you would like to reach me for any purpose, please DM me in Discord or text me. If you whisper to me in game (/msg), it will notify me, but no guarantees that I will see it. Thank you!";
     public static final List<Class<? extends Packet<?>>> ALLOWED_PACKETS = List.of(
             ClientboundDisconnectPacket.class, ClientboundKeepAlivePacket.class,
             ClientboundLoginPacket.class, ClientboundPlayerPositionPacket.class,
@@ -164,6 +164,8 @@ public class ExarotonBot {
             ExarotonClient client = new ExarotonClient(API_TOKEN);
             server = client.getServer(SERVER_ID).get();
 
+//            connect("localhost", 25565);
+
             server.subscribe();
             server.addStatusSubscriber(new ServerStatusSubscriber() {
                 @Override
@@ -178,7 +180,11 @@ public class ExarotonBot {
                 checkPlayerCount();
             }
 
-            while (true);
+            while (true) {
+                if (connection != null && !connection.isConnected() && connected && connection.getDisconnectedReason() != null) {
+                    disconnect(connection.getDisconnectedReason().getString());
+                }
+            }
         } catch (APIException e) {
             e.printStackTrace();
         }
@@ -327,8 +333,8 @@ public class ExarotonBot {
             isBootstrapped.setAccessible(true);
             if (!((Boolean) isBootstrapped.get(null))) {
                 isBootstrapped.set(null, true);
-                System.setErr(new LoggedPrintStream("STDERR", System.err));
-                System.setOut(new LoggedPrintStream("STDOUT", Bootstrap.STDOUT));
+//                System.setErr(new LoggedPrintStream("STDERR", System.err));
+//                System.setOut(new LoggedPrintStream("STDOUT", Bootstrap.STDOUT));
             }
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException(e);
@@ -336,7 +342,7 @@ public class ExarotonBot {
     }
 
     private static void connect(String ip, int port) {
-        if (connected || Arrays.stream(info.getList()).toList().contains(NAME)) {
+        if (connected || (info != null && Arrays.stream(info.getList()).toList().contains(NAME))) {
             System.out.println("Trying to connect while already connected!");
             return;
         }
